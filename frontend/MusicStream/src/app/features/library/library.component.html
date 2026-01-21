@@ -1,0 +1,143 @@
+<div class="max-w-5xl mx-auto p-8">
+  <header class="flex justify-between items-center mb-10">
+    <h2 class="text-4xl font-black text-white tracking-tighter">Ma Bibliothèque</h2>
+    <span class="bg-surface px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-gray-400 border border-gray-800">
+      {{ trackService.tracks().length }} Titres
+    </span>
+  </header>
+
+  <!-- SECTION AJOUT -->
+  <section class="bg-[#181818] p-8 rounded-xl shadow-2xl border border-white/5 mb-12">
+    <h3 class="text-lg font-bold mb-6 text-gray-300">Ajouter un nouveau titre</h3>
+    
+    <form [formGroup]="trackForm" (ngSubmit)="$event.preventDefault(); onSubmit()" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col space-y-2">
+          <label class="text-xs font-bold uppercase text-gray-500 ml-1">Titre de la chanson</label>
+          <input formControlName="title" placeholder="Ex: Moonlight"
+            class="bg-[#282828] text-white p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand border-none transition">
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <label class="text-xs font-bold uppercase text-gray-500 ml-1">Artiste</label>
+          <input formControlName="artist" placeholder="Ex: L'Artiste" 
+            class="bg-[#282828] text-white p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand border-none transition">
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <label class="text-xs font-bold uppercase text-gray-500 ml-1">Genre</label>
+          <select formControlName="category" class="bg-[#282828] text-white p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand border-none appearance-none">
+            <option value="pop">Pop</option>
+            <option value="rock">Rock</option>
+            <option value="rap">Rap</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <label class="text-xs font-bold uppercase text-gray-500 ml-1">Fichier Audio (MP3/WAV)</label>
+          <input type="file" (change)="onFileChange($event)" accept=".mp3,.wav,.ogg" 
+            class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-brand file:text-black hover:file:bg-green-400 cursor-pointer">
+        </div>
+      </div>
+
+      
+      <div class="flex justify-end gap-3 pt-4">
+  @if (isEditing) {
+    <button type="button" (click)="cancelEdit()" class="bg-gray-600 text-white px-6 py-3 rounded-full font-bold">
+      Annuler
+    </button>
+  }
+  <button type="submit" [disabled]="trackForm.invalid"
+    class="bg-brand text-black font-extrabold py-3 px-10 rounded-full hover:scale-105 transition">
+    {{ isEditing ? 'ENREGISTRER LES MODIFICATIONS' : 'PUBLIER LE TITRE' }}
+  </button>
+</div>
+    </form>
+  </section>
+
+  <!-- SECTION RECHERCHE ET FILTRES -->
+  <div class="flex flex-col md:flex-row gap-4 mb-8 items-center bg-white/5 p-4 rounded-2xl border border-white/10">
+    <div class="relative flex-1 w-full">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Rechercher un titre ou un artiste..."
+        (input)="updateSearch($any($event.target).value)"
+        class="w-full bg-black/40 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/50 border border-white/5 transition-all">
+    </div>
+
+    <div class="flex gap-2">
+      @for (genre of ['all', 'pop', 'rock', 'rap', 'jazz']; track genre) {
+        <button 
+          (click)="updateCategory(genre)"
+          [class.bg-brand]="trackService.selectedCategory() === genre"
+          [class.text-black]="trackService.selectedCategory() === genre"
+          [class.bg-white/5]="trackService.selectedCategory() !== genre"
+          class="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all border border-white/5 hover:border-brand/50">
+          {{ genre }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- SECTION LISTE DES TRACKS -->
+  <div class="space-y-2">
+    <!-- En-tête du tableau -->
+    <div class="grid grid-cols-12 px-4 py-2 text-gray-500 text-xs font-bold uppercase border-b border-white/5 mb-4">
+      <div class="col-span-1">#</div>
+      <div class="col-span-5">Titre / Artiste</div>
+      <div class="col-span-2">Genre</div>
+      <div class="col-span-2 text-center">Durée</div>
+      <div class="col-span-2 text-right">Action</div>
+    </div>
+
+    <!-- Liste des tracks filtrés -->
+    @for (track of trackService.filteredTracks(); track track.id; let i = $index) {
+      <div class="grid grid-cols-12 items-center px-4 py-3 rounded-md hover:bg-white/10 transition group">
+        <div class="col-span-1 text-gray-400 font-medium">{{ i + 1 }}</div>
+        
+        <div class="col-span-5">
+          <a [routerLink]="['/track', track.id]" class="cursor-pointer group">
+            <p class="font-bold text-white group-hover:text-brand transition">{{ track.title}}</p>
+            <p class="text-sm text-gray-400 group-hover:text-gray-300">{{ track.artist }}</p>
+          </a>
+        </div>
+        
+        <div class="col-span-2">
+          <span class="bg-white/5 px-3 py-1 rounded-full text-xs text-gray-300">{{ track.category }}</span>
+        </div>
+        
+        <div class="col-span-2 text-center text-sm text-gray-400 font-mono">
+          {{ track.duration | duration }}
+        </div>
+
+        <div class="col-span-2 text-right flex justify-end gap-2">
+  <button (click)="playTrack(track)" 
+    class="bg-brand/10 text-brand p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-brand hover:text-black">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+  </button>
+
+  <button (click)="confirmDelete(track)" 
+    class="bg-red-500/10 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500 hover:text-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  </button>
+
+  <button (click)="editTrack(track)" 
+  class="bg-blue-500/10 text-blue-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-blue-500 hover:text-white">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+  </svg>
+</button>
+</div>
+      </div>
+    } @empty {
+      <div class="text-center py-20 bg-surface/50 rounded-xl border border-dashed border-gray-800">
+        <p class="text-gray-500">Votre bibliothèque est vide. Commencez par ajouter une chanson !</p>
+      </div>
+    }
+  </div>
+</div>
