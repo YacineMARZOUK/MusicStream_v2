@@ -65,11 +65,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public record ErrorResponse(
-            LocalDateTime timestamp,
-            int status,
-            String error,
-            String message,
-            String path
-    ) {}
 }
