@@ -1,4 +1,4 @@
-package org.musicstream.backend.exception;
+package org.musicstream.backend.bacckenddd.exception;
 
 import java.time.LocalDateTime;
 

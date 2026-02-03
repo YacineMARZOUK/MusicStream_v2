@@ -1,10 +1,10 @@
-package org.musicstream.backend.dto.request;
+package org.musicstream.backend.bacckenddd.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.musicstream.backend.enums.Category;
+import org.musicstream.backend.bacckenddd.enums.Category;
 
 @Data
 @NoArgsConstructor

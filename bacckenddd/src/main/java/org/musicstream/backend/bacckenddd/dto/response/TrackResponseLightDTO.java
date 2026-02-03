@@ -1,16 +1,17 @@
-package org.musicstream.backend.dto.response;
+package org.musicstream.backend.bacckenddd.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.musicstream.backend.enums.Category;
+import org.musicstream.backend.bacckenddd.enums.Category;
 
 import java.time.LocalDateTime;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrackResponseDTO {
+public class TrackResponseLightDTO {
 
     private String id;
     private String title;
@@ -19,6 +20,5 @@ public class TrackResponseDTO {
     private LocalDateTime addedDate;
     private Integer duration;
     private Category category;
-    private byte[] fileData;
     private String coverImage;
 }

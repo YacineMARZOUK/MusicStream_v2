@@ -1,4 +1,4 @@
-package org.musicstream.backend;
+package org.musicstream.backend.bacckenddd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package org.musicstream.backend.exception;
+package org.musicstream.backend.bacckenddd.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

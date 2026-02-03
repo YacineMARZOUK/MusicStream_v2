@@ -1,12 +1,14 @@
-package org.musicstream.backend.entity;
+package org.musicstream.backend.bacckenddd.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.musicstream.backend.enums.Category;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.musicstream.backend.bacckenddd.enums.Category;
 
+import java.sql.Types;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 public class Track {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
 
     @Column(nullable = false)
@@ -40,8 +42,8 @@ public class Track {
     @Column(nullable = false)
     private Category category;
 
-    @Lob
-    @Column(name = "file_data", nullable = false, columnDefinition = "BYTEA")
+    @Lob // Indique que c'est un objet large
+    @JdbcTypeCode(Types.VARBINARY)    @Column(name = "file_data", nullable = false, columnDefinition = "BYTEA")
     private byte[] fileData;
 
     @Column(name = "cover_image", length = 500)

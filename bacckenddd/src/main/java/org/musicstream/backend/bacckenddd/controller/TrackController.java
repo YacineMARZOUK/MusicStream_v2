@@ -1,4 +1,4 @@
-package org.musicstream.backend.controller;
+package org.musicstream.backend.bacckenddd.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.musicstream.backend.dto.request.TrackRequestDTO;
-import org.musicstream.backend.dto.response.TrackResponseDTO;
-import org.musicstream.backend.dto.response.TrackResponseLightDTO;
-import org.musicstream.backend.enums.Category;
-import org.musicstream.backend.service.TrackService;
+import org.musicstream.backend.bacckenddd.dto.request.TrackRequestDTO;
+import org.musicstream.backend.bacckenddd.dto.response.TrackResponseDTO;
+import org.musicstream.backend.bacckenddd.dto.response.TrackResponseLightDTO;
+import org.musicstream.backend.bacckenddd.enums.Category;
+import org.musicstream.backend.bacckenddd.service.TrackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

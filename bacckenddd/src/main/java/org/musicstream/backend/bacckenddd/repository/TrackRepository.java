@@ -1,7 +1,7 @@
-package org.musicstream.backend.repository;
+package org.musicstream.backend.bacckenddd.repository;
 
-import org.musicstream.backend.entity.Track;
-import org.musicstream.backend.enums.Category;
+import org.musicstream.backend.bacckenddd.entity.Track;
+import org.musicstream.backend.bacckenddd.enums.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
