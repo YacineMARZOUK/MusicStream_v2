@@ -22,4 +22,7 @@ export class TrackService {
   deleteTrack(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  updateTrack(id: string, updates: Partial<Track>): Observable<Track> {
+    return this.http.put<Track>(`${this.apiUrl}/${id}`, updates);
+  }
 }

@@ -4,8 +4,8 @@ export interface Track {
   artist: string;
   description?: string;
   addedDate: Date;
-  duration: number; 
+  duration: number;
   category: 'pop' | 'rock' | 'rap' | 'jazz' | 'other';
-  fileData: Blob; 
-  coverImage?: string; 
+  fileData: File | Blob | any;
+  coverImage?: string;
 }

@@ -14,6 +14,20 @@ export class TrackEffects {
       catchError(error => of(TrackActions.loadTracksFailure({ error: error.message })))
     ))
   ));
+  deleteTrack$ = createEffect(() => this.actions$.pipe(
+    ofType(TrackActions.deleteTrack),
+    mergeMap(({ id }) => this.trackService.deleteTrack(id).pipe(
+      map(() => TrackActions.deleteTrackSuccess({ id })),
+      catchError(error => of(TrackActions.loadTracksFailure({ error: error.message })))
+    ))
+  ));
+  updateTrack$ = createEffect(() => this.actions$.pipe(
+    ofType(TrackActions.updateTrack),
+    mergeMap(({ id, updates }) => this.trackService.updateTrack(id, updates).pipe(
+      map(track => TrackActions.updateTrackSuccess({ track })),
+      catchError(error => of(TrackActions.loadTracksFailure({ error: error.message })))
+    ))
+  ));
 
   constructor(private actions$: Actions, private trackService: TrackService) {}
 }
