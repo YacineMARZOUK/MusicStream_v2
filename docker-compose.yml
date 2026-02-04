@@ -1,0 +1,43 @@
+services:
+  # 1. Base de données PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: musicstream-db
+    environment:
+      POSTGRES_DB: MusicStream
+      POSTGRES_USER: MusicStream
+      POSTGRES_PASSWORD: password123 # Mot de passe simple pour docker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Backend Spring Boot
+  backend:
+    build: ./bacckenddd
+    container_name: musicstream-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # On utilise le nom du service "db" comme host
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/MusicStream
+      SPRING_DATASOURCE_USERNAME: MusicStream
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Configuration Upload
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 50MB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 50MB
+
+  # 3. Frontend Angular
+  frontend:
+    build: ./frontend/MusicStream
+    container_name: musicstream-frontend
+    ports:
+      - "4200:80" # On accède via localhost:4200
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
