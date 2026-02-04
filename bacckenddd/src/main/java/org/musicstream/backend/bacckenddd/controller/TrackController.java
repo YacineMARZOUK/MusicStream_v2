@@ -32,9 +32,9 @@ public class TrackController {
      */
     @GetMapping
     @Operation(summary = "Get all tracks", description = "Retrieve all tracks (light version)")
-    public ResponseEntity<List<TrackResponseLightDTO>> getAllTracks() {
+    public ResponseEntity<List<TrackResponseDTO>> getAllTracks() {
         log.info("GET /api/tracks - Fetching all tracks");
-        List<TrackResponseLightDTO> tracks = trackService.getAllTracks();
+        List<TrackResponseDTO> tracks = trackService.getAllTracksWithFileData();
         return ResponseEntity.ok(tracks);
     }
 

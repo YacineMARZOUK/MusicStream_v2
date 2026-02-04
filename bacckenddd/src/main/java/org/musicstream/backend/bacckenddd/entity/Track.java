@@ -42,8 +42,10 @@ public class Track {
     @Column(nullable = false)
     private Category category;
 
-    @Lob // Indique que c'est un objet large
-    @JdbcTypeCode(Types.VARBINARY)    @Column(name = "file_data", nullable = false, columnDefinition = "BYTEA")
+    @Lob
+    @Basic(fetch = FetchType.EAGER) // Force le chargement des données binaires
+    @JdbcTypeCode(java.sql.Types.VARBINARY)
+    @Column(name = "file_data", nullable = false)
     private byte[] fileData;
 
     @Column(name = "cover_image", length = 500)

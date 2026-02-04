@@ -18,6 +18,12 @@ export class TrackService {
   addTrack(track: Track): Observable<Track> {
     return this.http.post<Track>(this.apiUrl, track);
   }
+  getAllTracks(): Observable<Track[]> {
+    return this.http.get<Track[]>(this.apiUrl);
+  }
+  getTrackById(id: string): Observable<Track> {
+    return this.http.get<Track>(`${this.apiUrl}/${id}`);
+  }
 
   deleteTrack(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

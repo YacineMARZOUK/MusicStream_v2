@@ -151,4 +151,14 @@ public class TrackService {
                 .map(track -> modelMapper.map(track, TrackResponseLightDTO.class))
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<TrackResponseDTO> getAllTracksWithFileData() {
+        log.info("Fetching all tracks WITH file data");
+        List<Track> tracks = trackRepository.findAll();
+
+        return tracks.stream()
+                .map(track -> modelMapper.map(track, TrackResponseDTO.class))
+                .collect(Collectors.toList());
+    }
 }

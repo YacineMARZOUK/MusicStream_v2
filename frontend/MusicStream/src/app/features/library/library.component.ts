@@ -1,32 +1,45 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { TrackActions } from '../../core/store/track.actions';
 import { Track } from '../../shared/components/models/track.model';
 import { AudioPlayerService } from '../../core/services/audio-player';
+import { TrackService } from '../../core/services/TrackService';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
 import { RouterLink } from '@angular/router';
-import { AsyncPipe, UpperCasePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {selectAllTracks} from '../../core/services/track.selectors';
 
 @Component({
   selector: 'app-library',
   standalone: true,
-  imports: [ReactiveFormsModule, DurationPipe, RouterLink, AsyncPipe],
+  imports: [
+    ReactiveFormsModule,
+    DurationPipe,
+    RouterLink,
+    AsyncPipe,
+  ],
   templateUrl: './library.component.html'
 })
 export class LibraryComponent implements OnInit {
   private fb = inject(FormBuilder);
   private store = inject(Store);
-  playerService = inject(AudioPlayerService);
 
-  // Observable pour le HTML
+  // Injection en public pour résoudre les erreurs TS2339 dans le HTML
+  public trackService = inject(TrackService);
+  public playerService = inject(AudioPlayerService);
+
+  // Observable pour la liste NgRx
   tracks$ = this.store.select(selectAllTracks);
 
   private selectedFile: File | null = null;
   private currentFileDuration: number = 0;
   isEditing = false;
   currentTrackId: string | null = null;
+
+
+  searchQuery = signal<string>('');
+  selectedCategory = signal<string>('all');
 
   trackForm = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(50)]],
@@ -39,7 +52,19 @@ export class LibraryComponent implements OnInit {
     this.store.dispatch(TrackActions.loadTracks());
   }
 
-  // --- LOGIQUE DE FICHIER (Inchangée) ---
+
+
+  updateSearch(query: string) {
+    this.searchQuery.set(query);
+
+  }
+
+  updateCategory(category: string) {
+    this.selectedCategory.set(category);
+
+  }
+
+  // --- LOGIQUE DE FICHIER ---
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file && file.size <= 10 * 1024 * 1024) {
@@ -52,43 +77,47 @@ export class LibraryComponent implements OnInit {
       };
       reader.readAsDataURL(file);
       this.trackForm.patchValue({ file: file });
+    } else {
+      alert("Fichier trop lourd ou invalide");
     }
   }
 
   // --- ACTIONS NGRX ---
   onSubmit() {
-    if (this.trackForm.valid) {
-      const formValues = this.trackForm.value;
+    if (this.trackForm.valid && this.selectedFile) {
+      const reader = new FileReader();
 
-      if (this.isEditing && this.currentTrackId) {
-        // UPDATE via NgRx
-        const updates: Partial<Track> = {
-          title: formValues.title!,
-          artist: formValues.artist!,
-          category: formValues.category as any,
-          duration: this.selectedFile ? this.currentFileDuration : undefined
-        };
-        this.store.dispatch(TrackActions.updateTrack({ id: this.currentTrackId, updates }));
-        this.cancelEdit();
-      } else {
+      // 1. Lire le fichier en tant qu'URL de données (Base64)
+      reader.readAsDataURL(this.selectedFile);
+
+      reader.onload = () => {
+        // 2. Récupérer uniquement la partie Base64 (après la virgule)
+        // Exemple : "data:audio/mp3;base64,SUQzBAAAAA..." -> on garde "SUQzBAAAAA..."
+        const base64String = (reader.result as string).split(',')[1];
 
         const newTrack: Track = {
           id: crypto.randomUUID(),
-          title: formValues.title!,
-          artist: formValues.artist!,
-          category: formValues.category as any,
-          addedDate: new Date(),
+          title: this.trackForm.value.title!,
+          artist: this.trackForm.value.artist!,
+          category: this.trackForm.value.category as any,
           duration: this.currentFileDuration,
-          fileData: []
+          fileData: base64String, // Envoi optimisé
+          addedDate: new Date()
         };
+
+
         this.store.dispatch(TrackActions.addTrack({ track: newTrack }));
         this.cancelEdit();
-      }
+      };
+
+      reader.onerror = (error) => {
+        console.error('Erreur lors de la lecture du fichier', error);
+      };
     }
   }
 
   confirmDelete(track: Track) {
-    if (confirm(`Supprimer "${track.title}" ?`)) {
+    if (confirm(`Voulez-vous vraiment supprimer "${track.title}" ?`)) {
       this.store.dispatch(TrackActions.deleteTrack({ id: track.id }));
     }
   }
@@ -97,7 +126,11 @@ export class LibraryComponent implements OnInit {
   editTrack(track: Track) {
     this.isEditing = true;
     this.currentTrackId = track.id;
-    this.trackForm.patchValue({ title: track.title, artist: track.artist, category: track.category });
+    this.trackForm.patchValue({
+      title: track.title,
+      artist: track.artist,
+      category: track.category
+    });
     this.trackForm.get('file')?.clearValidators();
     this.trackForm.get('file')?.updateValueAndValidity();
   }
@@ -110,5 +143,7 @@ export class LibraryComponent implements OnInit {
     this.trackForm.get('file')?.updateValueAndValidity();
   }
 
-  playTrack(track: Track) { this.playerService.playTrack(track); }
+  playTrack(track: Track) {
+    this.playerService.playTrack(track);
+  }
 }

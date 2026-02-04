@@ -4,7 +4,7 @@ import { PlayerBarComponent } from './shared/components/player-bar/player-bar.co
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, PlayerBarComponent, RouterLinkWithHref],
+  imports: [RouterOutlet, PlayerBarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
